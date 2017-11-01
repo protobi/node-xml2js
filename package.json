@@ -65,7 +65,9 @@
   "scripts": {
     "test": "zap",
     "coverage": "nyc npm test && nyc report",
-    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
+    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
+    "browserify": "browserify ./lib/xml2js.js  -s xml2js -o ./dist/xml2js.js",
+    "minify": "cat ./dist/xml2js.js  | uglifyjs > ./dist/xml2js.min.js"
   },
   "repository": {
     "type": "git",
