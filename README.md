@@ -24,6 +24,35 @@ install xml2js` which will download xml2js and all dependencies.
 xml2js is also available via [Bower](http://bower.io/), just `bower install
 xml2js` which will download xml2js and all dependencies.
 
+
+Use in browser
+==============
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script type="text/javascript" src="../dist/xml2js.js"></script>
+
+</head>
+<body>
+<h2>xml</h2>
+<pre id="xml"></pre>
+<h2>parsed</h2>
+<pre id="js"></pre>
+<script type="text/javascript">
+  var xml = '<?xml version="1.0" encoding="UTF - 8"?><note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Don\'t forget me this weekend!</body></note>'
+  document.getElementById('xml').innerHTML = xml
+  var obj = xml2js.parseString(xml, function(err, res) {
+    if (err) document.getElementById('js').innerHTML = err
+    else document.getElementById('js').innerHTML =JSON.stringify(res,null,4)
+  })
+</script>
+</body>
+</html>
+```
+
 Usage
 =====
 
