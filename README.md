@@ -292,8 +292,15 @@ value})``. Possible options are:
     whose value will correspond to the XML nodeName, so that you may iterate
     the "children" array and still be able to determine node names. The named
     (and potentially unordered) properties are also retained in this
-    configuration at the same level as the ordered "children" array. Added in
-    0.4.9.
+    configuration at the same level as the ordered "children" array. (**Added in
+    0.4.9.**)
+    
+   
+    `preserveChildrenOrder`  now also works when `explicitChildren` is false,
+     allowing order of mixed tags to be retained without duplicating information.
+      Further, `indexChildren` can be set to an array of tag names, so that order is 
+       preserved only for children of specific tags.  
+       
   * `charsAsChildren` (default `false`): Determines whether chars should be
     considered children if `explicitChildren` is on. Added in 0.2.5.
   * `includeWhiteChars` (default `false`): Determines whether whitespace-only

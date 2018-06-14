@@ -52,6 +52,10 @@ class exports.Parser extends events.EventEmitter
         @emit err
 
   assignOrPush: (obj, key, newValue) =>
+    if this.options.preserveChildrenOrder && !this.options.explicitChildren && (!this.options.indexChildren || (this.options.indexChildren.indexOf obj['#name']) >=0)
+      if this.options.indexkey not of obj
+        obj[this.options.indexkey] = []
+
     if key not of obj
       if not @options.explicitArray
         obj[key] = newValue
@@ -60,6 +64,9 @@ class exports.Parser extends events.EventEmitter
     else
       obj[key] = [obj[key]] if not (obj[key] instanceof Array)
       obj[key].push newValue
+
+    if obj[this.options.indexkey]
+      obj[this.options.indexkey].push key
 
   reset: =>
     # remove all previous listeners for events, to prevent event listener

@@ -54,44 +54,101 @@ class exports.Builder
           for key, entry of child
             element = render(element.ele(key), entry).up()
       else
-        for own key, child of obj
-          # Case #1 Attribute
-          if key is attrkey
-            if typeof child is "object"
-              # Inserts tag attributes
-              for attr, value of child
-                element = element.att(attr, value)
 
-          # Case #2 Char data (CDATA, etc.)
-          else if key is charkey
-            if @options.cdata && requiresCDATA child
-              element = element.raw wrapCDATA child
-            else
-              element = element.txt child
 
-          # Case #3 Array data
-          else if Array.isArray child
-            for own index, entry of child
-              if typeof entry is 'string'
-                if @options.cdata && requiresCDATA entry
-                  element = element.ele(key).raw(wrapCDATA entry).up()
-                else
-                  element = element.ele(key, entry).up()
+        if obj && this.options.indexkey of obj
+          # use the index to determine export order
+          counter = {}
+          for own key, child of obj
+            # Case #1 Attribute
+            if key is this.options.indexkey
+
+
+            else if key is attrkey
+              if typeof child is "object"
+                # Inserts tag attributes
+                for attr, value of child
+                  element = element.att(attr, value)
+
+            # Case #2 Char data (CDATA, etc.)
+            else if key is charkey
+              if @options.cdata && requiresCDATA child
+                element = element.raw wrapCDATA child
               else
-                element = render(element.ele(key), entry).up()
+                element = element.txt child
 
-          # Case #4 Objects
-          else if typeof child is "object"
-            element = render(element.ele(key), child).up()
+            # Case #3 Array data
+            else if Array.isArray child
+              counter[key] = 0;
+               # save for later...
 
-          # Case #5 String and remaining types
-          else
-            if typeof child is 'string' && @options.cdata && requiresCDATA child
-              element = element.ele(key).raw(wrapCDATA child).up()
+            # Case #4 Objects
+            else if typeof child is "object"
+              element = render(element.ele(key), child).up()
+
+            # Case #5 String and remaining types
             else
-              if not child?
-                child = ''
-              element = element.ele(key, child.toString()).up()
+              if typeof child is 'string' && @options.cdata && requiresCDATA child
+                element = element.ele(key).raw(wrapCDATA child).up()
+              else
+                if not child?
+                  child = ''
+                element = element.ele(key, child.toString()).up()
+
+          # now export in indexed order, destructively at first
+          for own index, tag of obj[this.options.indexkey]
+            entry = obj[tag][counter[tag]]
+            counter[tag] +=1
+
+            if typeof entry is 'string'
+              if @options.cdata && requiresCDATA entry
+                element = element.ele(tag).raw(wrapCDATA entry).up()
+              else
+                element = element.ele(tag, entry).up()
+            else
+              element = render(element.ele(tag), entry).up()
+
+        else
+          for own key, child of obj
+            if key is this.options.indexkey
+
+            # Case #1 Attribute
+            else if key is attrkey
+              if typeof child is "object"
+                # Inserts tag attributes
+                for attr, value of child
+                  element = element.att(attr, value)
+
+            # Case #2 Char data (CDATA, etc.)
+            else if key is charkey
+              if @options.cdata && requiresCDATA child
+                element = element.raw wrapCDATA child
+              else
+                element = element.txt child
+
+            # Case #3 Array data
+            else if Array.isArray child
+              for own index, entry of child
+                if typeof entry is 'string'
+                  if @options.cdata && requiresCDATA entry
+                    element = element.ele(key).raw(wrapCDATA entry).up()
+                  else
+                    element = element.ele(key, entry).up()
+                else
+                  element = render(element.ele(key), entry).up()
+
+            # Case #4 Objects
+            else if typeof child is "object"
+              element = render(element.ele(key), child).up()
+
+            # Case #5 String and remaining types
+            else
+              if typeof child is 'string' && @options.cdata && requiresCDATA child
+                element = element.ele(key).raw(wrapCDATA child).up()
+              else
+                if not child?
+                  child = ''
+                element = element.ele(key, child.toString()).up()
 
       element
 

@@ -64,7 +64,7 @@
       }
       render = (function(_this) {
         return function(element, obj) {
-          var attr, child, entry, index, key, value;
+          var attr, child, counter, entry, index, key, ref, tag, value;
           if (typeof obj !== 'object') {
             if (_this.options.cdata && requiresCDATA(obj)) {
               element.raw(wrapCDATA(obj));
@@ -81,46 +81,101 @@
               }
             }
           } else {
-            for (key in obj) {
-              if (!hasProp.call(obj, key)) continue;
-              child = obj[key];
-              if (key === attrkey) {
-                if (typeof child === "object") {
-                  for (attr in child) {
-                    value = child[attr];
-                    element = element.att(attr, value);
-                  }
-                }
-              } else if (key === charkey) {
-                if (_this.options.cdata && requiresCDATA(child)) {
-                  element = element.raw(wrapCDATA(child));
-                } else {
-                  element = element.txt(child);
-                }
-              } else if (Array.isArray(child)) {
-                for (index in child) {
-                  if (!hasProp.call(child, index)) continue;
-                  entry = child[index];
-                  if (typeof entry === 'string') {
-                    if (_this.options.cdata && requiresCDATA(entry)) {
-                      element = element.ele(key).raw(wrapCDATA(entry)).up();
-                    } else {
-                      element = element.ele(key, entry).up();
+            if (obj && _this.options.indexkey in obj) {
+              counter = {};
+              for (key in obj) {
+                if (!hasProp.call(obj, key)) continue;
+                child = obj[key];
+                if (key === _this.options.indexkey) {
+
+                } else if (key === attrkey) {
+                  if (typeof child === "object") {
+                    for (attr in child) {
+                      value = child[attr];
+                      element = element.att(attr, value);
                     }
+                  }
+                } else if (key === charkey) {
+                  if (_this.options.cdata && requiresCDATA(child)) {
+                    element = element.raw(wrapCDATA(child));
                   } else {
-                    element = render(element.ele(key), entry).up();
+                    element = element.txt(child);
+                  }
+                } else if (Array.isArray(child)) {
+                  counter[key] = 0;
+                } else if (typeof child === "object") {
+                  element = render(element.ele(key), child).up();
+                } else {
+                  if (typeof child === 'string' && _this.options.cdata && requiresCDATA(child)) {
+                    element = element.ele(key).raw(wrapCDATA(child)).up();
+                  } else {
+                    if (child == null) {
+                      child = '';
+                    }
+                    element = element.ele(key, child.toString()).up();
                   }
                 }
-              } else if (typeof child === "object") {
-                element = render(element.ele(key), child).up();
-              } else {
-                if (typeof child === 'string' && _this.options.cdata && requiresCDATA(child)) {
-                  element = element.ele(key).raw(wrapCDATA(child)).up();
-                } else {
-                  if (child == null) {
-                    child = '';
+              }
+              ref = obj[_this.options.indexkey];
+              for (index in ref) {
+                if (!hasProp.call(ref, index)) continue;
+                tag = ref[index];
+                entry = obj[tag][counter[tag]];
+                counter[tag] += 1;
+                if (typeof entry === 'string') {
+                  if (_this.options.cdata && requiresCDATA(entry)) {
+                    element = element.ele(tag).raw(wrapCDATA(entry)).up();
+                  } else {
+                    element = element.ele(tag, entry).up();
                   }
-                  element = element.ele(key, child.toString()).up();
+                } else {
+                  element = render(element.ele(tag), entry).up();
+                }
+              }
+            } else {
+              for (key in obj) {
+                if (!hasProp.call(obj, key)) continue;
+                child = obj[key];
+                if (key === _this.options.indexkey) {
+
+                } else if (key === attrkey) {
+                  if (typeof child === "object") {
+                    for (attr in child) {
+                      value = child[attr];
+                      element = element.att(attr, value);
+                    }
+                  }
+                } else if (key === charkey) {
+                  if (_this.options.cdata && requiresCDATA(child)) {
+                    element = element.raw(wrapCDATA(child));
+                  } else {
+                    element = element.txt(child);
+                  }
+                } else if (Array.isArray(child)) {
+                  for (index in child) {
+                    if (!hasProp.call(child, index)) continue;
+                    entry = child[index];
+                    if (typeof entry === 'string') {
+                      if (_this.options.cdata && requiresCDATA(entry)) {
+                        element = element.ele(key).raw(wrapCDATA(entry)).up();
+                      } else {
+                        element = element.ele(key, entry).up();
+                      }
+                    } else {
+                      element = render(element.ele(key), entry).up();
+                    }
+                  }
+                } else if (typeof child === "object") {
+                  element = render(element.ele(key), child).up();
+                } else {
+                  if (typeof child === 'string' && _this.options.cdata && requiresCDATA(child)) {
+                    element = element.ele(key).raw(wrapCDATA(child)).up();
+                  } else {
+                    if (child == null) {
+                      child = '';
+                    }
+                    element = element.ele(key, child.toString()).up();
+                  }
                 }
               }
             }
@@ -209,7 +264,8 @@
       headless: false,
       chunkSize: 10000,
       emptyTag: '',
-      cdata: false
+      cdata: false,
+      indexkey: "!"
     }
   };
 
@@ -309,17 +365,25 @@
     };
 
     Parser.prototype.assignOrPush = function(obj, key, newValue) {
+      if (this.options.preserveChildrenOrder && !this.options.explicitChildren && (!this.options.indexChildren || (this.options.indexChildren.indexOf(obj['#name'])) >= 0)) {
+        if (!(this.options.indexkey in obj)) {
+          obj[this.options.indexkey] = [];
+        }
+      }
       if (!(key in obj)) {
         if (!this.options.explicitArray) {
-          return obj[key] = newValue;
+          obj[key] = newValue;
         } else {
-          return obj[key] = [newValue];
+          obj[key] = [newValue];
         }
       } else {
         if (!(obj[key] instanceof Array)) {
           obj[key] = [obj[key]];
         }
-        return obj[key].push(newValue);
+        obj[key].push(newValue);
+      }
+      if (obj[this.options.indexkey]) {
+        return obj[this.options.indexkey].push(key);
       }
     };
 

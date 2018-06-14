@@ -10,6 +10,7 @@ exports.defaults = {
     attrkey: "@"
     # set default char object key
     charkey: "#"
+
     # always put child nodes in an array
     explicitArray: false
     # ignore all attributes regardless
@@ -70,4 +71,7 @@ exports.defaults = {
     chunkSize: 10000
     emptyTag: ''
     cdata: false
+
+    #track order of objects
+    indexkey: "!"
 }

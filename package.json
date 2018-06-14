@@ -6,7 +6,7 @@
     "json"
   ],
   "homepage": "https://github.com/Leonidas-from-XIV/node-xml2js",
-  "version": "0.4.19",
+  "version": "0.4.20",
   "author": "Marek Kubica <marek@xivilization.net> (https://xivilization.net)",
   "contributors": [
     "maqr <maqr.lollerskates@gmail.com> (https://github.com/maqr)",
@@ -68,7 +68,8 @@
     "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
     "browserify": "browserify ./lib/xml2js.js  -s xml2js -o ./dist/xml2js.js",
     "minify": "cat ./dist/xml2js.js  | uglifyjs > ./dist/xml2js.min.js",
-    "compile": "coffee --compile --output lib/ src"
+    "compile": "coffee --compile --output lib/ src",
+    "all": "npm run test && npm run compile && npm run browserify && npm run minify"
   },
   "repository": {
     "type": "git",
