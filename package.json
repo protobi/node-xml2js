@@ -66,7 +66,7 @@
     "test": "zap",
     "coverage": "nyc npm test && nyc report",
     "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
-    "browserify": "browserify ./lib/xml2js.js  -s xml2js -o ./dist/xml2js.js",
+    "browserify": "browserify ./lib/xml2js.js  -s xml2js | derequire > ./dist/xml2js.js",
     "minify": "cat ./dist/xml2js.js  | uglifyjs > ./dist/xml2js.min.js",
     "compile": "coffee --compile --output lib/ src",
     "all": "npm run test && npm run compile && npm run browserify && npm run minify"
@@ -80,8 +80,10 @@
     "xmlbuilder": "~9.0.1"
   },
   "devDependencies": {
+    "browserify": "^16.2.2",
     "coffee-script": ">=1.10.0",
     "coveralls": "^2.11.2",
+    "derequire": "^2.0.6",
     "diff": ">=1.0.8",
     "docco": ">=0.6.2",
     "nyc": ">=2.2.1",

@@ -110,7 +110,7 @@ class exports.Parser extends events.EventEmitter
 
     @saxParser.onopentag = (node) =>
       obj = {}
-      obj[charkey] = ""
+      obj[charkey] = ""  # PSV 
       unless @options.ignoreAttrs
         for own key of node.attributes
           if attrkey not of obj and not @options.mergeAttrs
